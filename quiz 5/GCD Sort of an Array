@@ -1,0 +1,49 @@
+class Solution {
+public:
+    vector<int> parent;
+
+    int find(int x) {
+        if (parent[x] != x)
+            parent[x] = find(parent[x]);
+        return parent[x];
+    }
+
+    void unite(int x, int y) {
+        int px = find(x), py = find(y);
+        if (px != py) parent[px] = py;
+    }
+
+    vector<int> getPrimes(int x) {
+        vector<int> primes;
+        for (int d = 2; d * d <= x; d++) {
+            if (x % d == 0) {
+                primes.push_back(d);
+                while (x % d == 0) x /= d;
+            }
+        }
+        if (x > 1) primes.push_back(x);
+        return primes;
+    }
+
+    bool gcdSort(vector<int>& nums) {
+        int maxVal = *max_element(nums.begin(), nums.end());
+        parent.resize(maxVal + 1);
+        for (int i = 0; i <= maxVal; i++) parent[i] = i;
+
+        for (int x : nums) {
+            vector<int> primes = getPrimes(x);
+            for (int p : primes) {
+                unite(x, p);
+            }
+        }
+
+        vector<int> sorted = nums;
+        sort(sorted.begin(), sorted.end());
+
+        for (int i = 0; i < nums.size(); i++) {
+            if (find(nums[i]) != find(sorted[i])) return false;
+        }
+
+        return true;
+    }
+};
